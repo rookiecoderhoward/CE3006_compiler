@@ -1,0 +1,67 @@
+%{
+#include<stdio.h>
+int i;
+int j;
+%}
+%option noyywrap
+
+int_num     [0-9]+
+int         ^{int_num}$    
+
+float_num   ([0-9]+\.[0-9]+)|([0-9]+\.)|(\.[0-9]+)
+float       ^{float_num}$
+
+string_double_q     ^\"(.)+\"$      
+string_one_q        ^\'(.)+\'$
+
+
+var_data    [a-zA-Z_][a-zA-Z_0-9]*
+var         ^{var_data}$
+
+%%
+
+{int}       {ECHO; printf(" INTERGER\n");}
+{float}     {ECHO; printf(" FLOAT\n");}
+
+{string_double_q}  {
+    for (i = 1; i < yyleng-1; i++) {
+        if (yytext[i] == '\"') {
+            break;
+        }
+        else {
+            if (i == yyleng-2) {
+                for (j = 0; j < yyleng; j++) {
+                    printf("%c", yytext[j]);
+                }
+                printf(" STRING\n");
+            }
+        }
+    }
+}
+
+{string_one_q}  {
+    for (i = 1; i < yyleng-1; i++) {
+        if (yytext[i] == '\'') {
+            break;
+        }
+        else {
+            if (i == yyleng-2) {
+                for (j = 0; j < yyleng; j++) {
+                    printf("%c", yytext[j]);
+                }
+                printf(" STRING\n");
+            }
+        }
+    }
+}
+
+{var}   {ECHO; printf(" VARIABLE\n");}
+
+.|\n    ;
+
+%%
+
+int main() {
+    yylex();
+    return 0;
+}
